@@ -1,0 +1,75 @@
+import arcpy
+import random
+
+# Variable - List
+NFL_Teams = ['Steelers', '49ers', 'Bears', 'Bengals', 'Bills', 'Broncos', 'Browns', 'Buccaneers', 'Cardinals',
+             'Chargers', 'Chiefs', 'Colts', 'Cowboys', 'Dolphins', 'Eagles', 'Falcons',	'Giants', 'Jaguars', 'Jets',
+             'Lions', 'Packers', 'Panthers', 'Patriots', 'Raiders', 'Rams', 'Ravens', 'Redskins', 'Saints',	'Seahawks',
+             'Texans', 'Titans', 'Vikings']
+
+# Print Function
+
+print(NFL_Teams)
+
+# Randomly select the best team
+
+print('The best NFL Team is the ' + random.choice(NFL_Teams))
+
+# Obviously the best team isn't random... List Index
+
+print('The best NFL Team is the ' + NFL_Teams[0])
+
+# That's better. Don't like it tough this is my presentation my six beats yours. Yes Tom Brady's 7 and New England's 6
+# don't count.
+
+# Taking List and iterating it through a for loop
+
+for team in NFL_Teams:
+    print(team)
+
+# if else through a loop
+
+for team in NFL_Teams:
+    if team == 'Steelers':
+        print(team + ' are the best NFL Team')
+    else:
+        print(team + ' are not the best NFL Team')
+
+
+# These are just some things you can do once you learn and experiment with basic syntax, but what does my infatuation
+# with the steelers have to do with GIS
+
+# Create points for stadium locations for all teams ### NEED TO CREATE AN EXCEL FILE OF ALL NFL Teams with X, Y, &
+# Superbowl wins
+
+# https://pro.arcgis.com/en/pro-app/latest/tool-reference/data-management/xy-table-to-point.htm
+
+in_table = r'S:\Andrew\Superbowls_Presentation.csv'
+out_feature_class = r'C:\Users\aparkin\Documents\ArcGIS\Projects\NFLTeams\NFLTeams.gdb\NFLStadiums'
+x_field = 'longitude'
+y_field = 'latitude'
+z_field = None
+coordinate_system = "GCS_WGS_1984"
+
+print('Starting Table to Point...')
+arcpy.management.XYTableToPoint(in_table, out_feature_class, x_field, y_field, z_field, coordinate_system)
+print('Finished Table to Point!')
+
+# Import symbology apply symbology from Layer
+
+# https://pro.arcgis.com/en/pro-app/latest/tool-reference/data-management/apply-symbology-from-layer.htm
+
+in_layer = r'C:\Users\aparkin\Documents\ArcGIS\Projects\NFLTeams\NFLTeams.gdb\NFLStadiums'
+in_symbology_layer = r'S:\Andrew\NFLStadiums.lyrx'
+
+print('Applying Symbology....')
+arcpy.management.ApplySymbologyFromLayer(in_layer, in_symbology_layer)
+print('Finished Symbology!')
+
+# Export
+aprx = arcpy.mp.ArcGISProject('CURRENT')
+layout = aprx.listLayouts()[0]
+
+print('Exporting Layout to PDF....')
+layout.exportToPDF(r'S:\Andrew\NFLMap', resolution=300)
+print('Finished Export!')
