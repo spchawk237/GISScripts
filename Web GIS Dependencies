@@ -1,0 +1,94 @@
+# -*- coding: utf-8 -*-
+# ---------------------------------------------------------------------------
+# WebGIS_Dependencies.py
+# Created on: 2023-03-23
+# Works in ArcGIS Pro
+#
+# Author: Andrew Parkin/GIS Manager
+#
+# Description:
+# Will find a list of web maps and/or web applications where the referenced
+# layer is contained within a web map and/or a web mapping application
+#
+# Works with Enterprise GIS & ArcGIS Online
+#
+# Works with:
+# Map Image/Feature Layers
+# Tables
+# GP Tools
+# Locators
+# Tile Layers
+#
+# ---------------------------------------------------------------------------
+
+from arcgis.gis import GIS
+import pandas as pd
+
+# gis = GIS('your-portal-url', 'username')
+
+print("Logging into AGOL..")
+
+gis = GIS('https://crawfordcountypa.maps.arcgis.com/home/index.html', 'gisadmin_crawford', 'KentuckyFRIEDp0tat0!')
+
+print('Logged into AGOL!')
+
+# Find Url IDs for all feature Classes
+print('Finding All Feature Class ID URLs...')
+
+FeatureClasses = gis.content.search('', item_type='Feature Service', max_items=-1)
+FeatureClassID = []
+FeatureClassURL = []
+
+for fc in FeatureClasses:
+    ID = fc.id
+    FeatureClassID.append(ID)
+    FeatureClassURL.append(gis.content.get(ID).url)
+
+print(FeatureClassID)
+print(len(FeatureClassID))
+print(FeatureClassURL)
+print(len(FeatureClassURL))
+print('Found All Feature Class ID URLs!')
+
+# Pull list of all web maps in portal
+print('Finding all webmaps..')
+webmaps = gis.content.search('', item_type='Web Map', max_items=-1)
+print('Found all webmaps!')
+
+# Return subset of map IDs which contain the service URL we're looking for
+print('Finding Webmaps matching ID..')
+matches = [m.id for m in webmaps if str(m.get_data()).find(find_url) > -1]
+print('Found Webmaps matching ID!')
+
+# Pull list of all web apps in portal
+print('Finding all Webapps...')
+webapps = gis.content.search('', item_type='Application', max_items=-1)
+print('Found all Webapps!')
+
+# Create empty list to populate with results
+app_list = []
+
+# Check each web app for matches
+for fc in F
+    for w in webapps:
+
+        try:
+            # Get the JSON as a string
+            wdata = str(w.get_data())
+
+            criteria = [
+                wdata.find(find_url) > -1,  # Check if URL is directly referenced
+                any([wdata.find(i) > -1 for i in matches])  # Check if any matching maps are in app
+            ]
+
+            # If layer is referenced directly or indirectly, append app to list
+            if any(criteria):
+                app_list.append(w)
+
+        # Some apps don't have data, so we'll just skip them if they throw a TypeError
+        except:
+            continue
+
+output = pd.DataFrame([{'title': a.title, 'id': a.id, 'type': a.type} for a in app_list])
+
+print(output)
