@@ -36,8 +36,6 @@ gis = GIS('Insert url to AGOL OR ENTERPRISE HERE', Username, Password)
 
 print('Logged into AGOL!')
 
-
-
 # Feature Class Variables
 FeatureClassName = []
 FeatureClassID = []
@@ -146,44 +144,3 @@ with pd.ExcelWriter(ExcelOutput) as writer:
     WebAppDF.to_excel(writer, sheet_name='Web Apps')
 
 print('Combined Full Inventory DataFrames to xlsx!')
-
-
-
-# Return subset of map IDs which contain the service URL we're looking for *** TWEAK TO FIT LIKE ABOVE WHERE IT APPENDS TO TWO TABLES TO GET WEB MAP ID AND URL
-
-print('Finding Webmaps matching ID..')
-matches = [m.id for m in webmaps if str(m.get_data()).find(find_url) > -1]
-print('Found Webmaps matching ID!')
-
-# Pull list of all web apps in portal
-print('Finding all Webapps...')
-webapps = gis.content.search('', item_type='Application', max_items=-1)
-print('Found all Webapps!')
-
-# Create empty list to populate with results
-app_list = []
-
-# Check each web app for matches
-for fc in FeatureClassURL:
-    for w in webapps:
-
-        try:
-            # Get the JSON as a string
-            wdata = str(w.get_data())
-
-            criteria = [
-                wdata.find(fc) > -1,  # Check if URL is directly referenced
-                any([wdata.find(i) > -1 for i in matches])  # Check if any matching maps are in app
-            ]
-
-            # If layer is referenced directly or indirectly, append app to list
-            if any(criteria):
-                app_list.append(w)
-
-        # Some apps don't have data, so we'll just skip them if they throw a TypeError
-        except:
-            continue
-
-output = pd.DataFrame([{'title': a.title, 'id': a.id, 'type': a.type} for a in app_list])
-
-print(output)
