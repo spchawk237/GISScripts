@@ -32,8 +32,7 @@ ExcelOutput = r'R:\GIS\GIS_LOGS\ExcelOutputs\WebGISDependencies.xlsx'
 
 print("Logging into AGOL..")
 
-# gis = GIS('Insert url to AGOL OR ENTERPRISE HERE', Username, Password)
-gis = GIS('https://crawfordcountypa.maps.arcgis.com/home/index.html', 'gisadmin_crawford', 'KentuckyFRIEDp0tat0!')
+gis = GIS('Insert url to AGOL OR ENTERPRISE HERE', Username, Password)
 
 print('Logged into AGOL!')
 
