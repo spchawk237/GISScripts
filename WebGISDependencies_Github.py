@@ -58,15 +58,10 @@ for fc in FeatureClasses:
     AGOLWMID_dict[fc.id] = []
     AGOLWAID_dict[fc.id] = []
     # Collecting all Feature Class Names and appending them to FeatureClassName Variable
-    # AGOLFeatureClassName.append(fc.title)
     AGOLFCName_dict[fc.id].append(fc.title)
-    # Collecting all Feature Class IDs and appending them to FeatureClassID Variable
-    # AGOLFeatureClassID.append(fc.id)
     # Collecting all Feature Class URLs and appending them to FeatureClassURL Variable
-    # AGOLFeatureClassURL.append(URL)
     AGOLFCURL_dict[fc.id].append(URL)
     # Collecting all Feature Class Owners and appending them to FeatureClassOwner Variable
-    # AGOLFeatureClassOwner.append(fc.owner)
     AGOLFCOwner_dict[fc.id].append(fc.owner)
     # Finding Web Map IDs that use feature class
     matches = [m.id for m in webmaps if str(m.get_data()).find(URL) > -1]
@@ -90,11 +85,8 @@ for fc in FeatureClasses:
             ]
 
             # If there's a match append to Dictionary if not, do nothing.
-            if len(criteria) > 0:
+            if any(criteria):
                 AGOLWAID_dict[fc.id].append(w.id)
-            else:
-                pass
-
         # Some apps don't have data, so we'll just skip them if they throw a TypeError
         except:
             continue
@@ -103,13 +95,23 @@ for fc in FeatureClasses:
 
 # Using dictionaries to create Data Frames
 print('Appending Data to DF then Exporting to Excel')
+AGOLWMID_Count = []
+AGOLWAID_Count = []
 
 MasterDF['Feature Class ID'] = AGOLFCName_dict.keys()
 MasterDF['Feature Class Name'] = AGOLFCName_dict.values()
 MasterDF['Feature Class Url'] = AGOLFCURL_dict.values()
 MasterDF['Feature Class Owner'] = AGOLFCOwner_dict.values()
-MasterDF['Number of Web Maps'] = len(AGOLWMID_dict.values())
-MasterDF['Number of Web Apps'] = len(AGOLWAID_dict.values())
+
+for k in AGOLWMID_dict:
+    AGOLWMID_Count.append(len(AGOLWMID_dict[k]))
+
+for k in AGOLWAID_dict:
+    AGOLWAID_Count.append(len(AGOLWAID_dict[k]))
+
+# Getting Web Map and Application Counts
+MasterDF['Number of Web Maps'] = AGOLWMID_Count
+MasterDF['Number of Web Apps'] = AGOLWAID_Count
 
 # Exporting DF to Excel
 MasterDF.to_excel(ExcelOutput)
