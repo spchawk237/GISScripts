@@ -43,7 +43,6 @@ for i in ItemList:
         for t in Temp:
             Items.append(t)
 
-ItemsTest = Items[:10]
 print('Collected Item Data!')
 print('Collecting Webmaps...')
 
@@ -123,7 +122,7 @@ def my_func(item):
 
 
 # Running function through a loop
-for i in ItemsTest:
+for i in Items:
     print("Starting " + str(i.title))
     my_func(i)
     print("Finished " + str(i.title))
