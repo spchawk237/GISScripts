@@ -18,16 +18,16 @@
 from arcgis.gis import GIS
 import pandas as pd
 
+# File Location you want the excel output
+ExcelOutput = r'R:\GIS\GIS_LOGS\ExcelOutputs\WebGISDependencies.xlsx'
+
 # Logging in works with Enterprise and AGOL
 
-print("Logging into AGOL..")
+print('Logged in...')
 
 gis = GIS('Insert url to AGOL OR ENTERPRISE HERE', 'Username', 'Password')
 
-print('Logged into AGOL!')
-
-# File Location you want the excel output
-ExcelOutput = r'Insert File Path Here!!!!'
+print('Logged in!')
 
 # Grabbing feature class, Image service, Map Service, WFS, WMS Information
 print('Collecting Item Data...')
@@ -112,11 +112,11 @@ def my_func(item):
     if len(app_list) > 0:
         for a in app_list:
             FuncResults.append({'Item Name': item_title, 'Item Type': item_type, 'Item ID': find_id,
-                                'Item Owner': item_owner, 'Application Name': a.title, 'Application Type': a.type,
-                                'Application ID': a.id, 'Application Owner': a.owner})
+                                'Item Url': find_url, 'Item Owner': item_owner, 'Application Name': a.title,
+                                'Application Type': a.type, 'Application ID': a.id, 'Application Owner': a.owner})
 
     if len(app_list) == 0:
-        FuncResults.append({'Item Name': item_title, 'Item Type': item_type, 'Item ID': find_id,
+        FuncResults.append({'Item Name': item_title, 'Item Type': item_type, 'Item ID': find_id, 'Item Url': find_url,
                             'Item Owner': item_owner, 'Application Name': 'N/A', 'Application Type': 'N/A',
                             'Application ID': 'N/A', 'Application Owner': 'N/A'})
 
@@ -128,7 +128,13 @@ for i in Items:
     print("Finished " + str(i.title))
 
 df = pd.DataFrame(FuncResults)
-
+print('DataFrame Pre Sort')
 print(df)
-df.to_excel(ExcelOutput, index=False)
+
+mask = df['Item Url'].ne(df['Item Url'].shift(-1))
+df1 = pd.DataFrame('', index=mask.index[mask] + .5, columns=df.columns)
+
+new_df = pd.concat([df, df1]).sort_index().reset_index(drop=True).iloc[:-1]
+print(new_df)
+new_df.to_excel(ExcelOutput, index=False)
 print('Finished')
