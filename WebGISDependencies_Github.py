@@ -29,10 +29,19 @@ gis = GIS('Insert url to AGOL OR ENTERPRISE HERE', 'Username', 'Password')
 
 print('Logged in!')
 
-# Grabbing feature class, Image service, Map Service, WFS, WMS Information
+# Grabbing Item Information
 print('Collecting Item Data...')
 
-ItemList = ['Feature Service', 'Image Service', 'Map Service', 'WFS', 'WMS']
+ItemList = ['Administrative Report', 'Apache Parquet', 'CAD Drawing', 'CSV', 'Color Set', 'Content Category Set',
+            'Document Link', 'Esri Classifier Definition', 'Export Package', 'Feature Collection',
+            'Feature Collection Template', 'Feature Service', 'File Geodatabase', 'GeoJson', 'GML', 'GeoPackage',
+            'Geocoding Service', 'Geodata Service', 'Geometry Service', 'Geoprocessing Service', 'Globe Service',
+            'Image', 'KML', 'KML CollectionMap Service', 'Microsoft Excel', 'Microsoft Powerpoint',
+            'Microsoft Word', 'Network Analysis Service', 'OGCFeatureServer', 'Oriented Imagery Catalog', 'PDF',
+            'Relational Database Connection', 'Relational Database Connection', 'Report Template', 'SQLite Geodatabase',
+            'Scene Service', 'Service Definition', 'Shapefile', 'Statistical Data Collection', 'StoryMap Theme',
+            'Style', 'Symbol SetImage Service', 'Vector Tile Service', 'Visio Document', 'WFS', 'WMS', 'WMTS',
+            'Workflow Manager Service', 'iWork Keynote', 'iWork Numbers', 'iWork Pages']
 
 # Combining all Item types into a single list
 Items = []
@@ -52,8 +61,17 @@ print('Collected Webmaps!')
 print('Collecting Application Data..')
 # Gathering Application Information
 
-AppList = ['Web Map', 'Web Mapping Application', 'Hub Site Application', 'Dashboard', 'Form', 'Hub Page', 'Solution',
-           'StoryMap']
+AppList = ['360 VR Experience', 'AppBuilder Extension', 'AppBuilder Widget Package', 'CityEngine Web Scene',
+           'Code Attachment', 'Dashboard', 'Deep Learning Studio Project', 'Esri Classification Schema',
+           'Excalibur Imagery Project', 'Experience Builder Widget', 'Experience Builder Widget Package', 'Form',
+           'GeoBIM Application', 'GeoBIM Project', 'Hub Event', 'Hub Initiative', 'Hub Initiative Template', 'Hub Page',
+           'Hub Project', 'Hub Site Application', 'Insights Data Engineering Model',
+           'Insights Data Engineering Workbook', 'Insights Model', 'Insights Page', 'Insights Theme',
+           'Insights Workbook', 'Insights Workbook Package', 'Investigation', 'Mission', 'Mobile Application',
+           'Native Application', 'Native Application Installer', 'Notebook', 'Notebook Code Snippet Library',
+           'Operation View', 'Operations Dashboard Add In', 'Operations Dashboard Extension', 'Ortho Mapping Project',
+           'Ortho Mapping Template', 'Pro Map', 'StoryMap', 'Web AppBuilder WidgetSolution', 'Web Experience',
+           'Web Experience Template', 'Web Map', 'Web Mapping Application', 'Web Scene', 'Workforce Project']
 
 # Combining all Apps into a single list
 WebApps = []
@@ -73,12 +91,10 @@ FuncResults = []
 
 # ***Defining function that will gather the information we need. ***
 def my_func(item):
-    # Layer ID to search for and its URL
+    # Item info
     item_info = item
     find_id = item_info.id
     find_url = gis.content.get(find_id).url
-
-    # Additional Item Variables
     item_title = item_info.title
     item_owner = item_info.owner
     item_type = item_info.type
@@ -128,13 +144,7 @@ for i in Items:
     print("Finished " + str(i.title))
 
 df = pd.DataFrame(FuncResults)
-print('DataFrame Pre Sort')
+
 print(df)
-
-mask = df['Item Url'].ne(df['Item Url'].shift(-1))
-df1 = pd.DataFrame('', index=mask.index[mask] + .5, columns=df.columns)
-
-new_df = pd.concat([df, df1]).sort_index().reset_index(drop=True).iloc[:-1]
-print(new_df)
-new_df.to_excel(ExcelOutput, index=False)
+df.to_excel(ExcelOutput, index=False)
 print('Finished')
