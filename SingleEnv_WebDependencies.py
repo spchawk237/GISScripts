@@ -4,7 +4,7 @@
 # Created on: 2023-03-23
 # Works in ArcGIS Pro
 #
-# Author: Andrew Parkin/GIS Manager with a lot of support of Phil Baranyai #SpatialAF
+# Author: Andrew Parkin/GIS Manager with a lot of help and support of Phil Baranyai #SpatialAF
 #
 # Description:
 # Will show FCs and all their dependencies across your enterprise or AGOL environments

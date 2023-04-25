@@ -4,15 +4,12 @@
 # Created on: 2023-04-14
 # Works in ArcGIS Pro
 #
-# Author: Andrew Parkin/GIS Manager
+# Author: Andrew Parkin/GIS Manager with a lot of help and support of Phil Baranyai #SpatialAF
 #
 # Description:
-# Will show Items (Feature Services, Map Services KML etc) and all their dependencies across your systems.
+# Will show Items and all their dependencies across your systems.
 # It will show relationship between Enterprise and AGOL
 #
-#
-#
-# Need to look into adding the following applications: Dashboard, Form, Hub Page, Solution, StoryMap
 # ---------------------------------------------------------------------------
 
 from arcgis.gis import GIS
