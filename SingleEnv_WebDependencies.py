@@ -180,8 +180,24 @@ for i in Items:
     my_func(gis, i, WebApps)
 print('Finished Items')
 
+# Creating dataframe
+print('Creating Data Frame')
+
 df = pd.DataFrame(FuncResults)
 
-print(df)
-df.to_excel(ExcelOutput, index=False)
+# Sorting by Url with Portal items on top of AGOL
+df1 = df.sort_values(by=['Item Url'], ascending=[True])
+# Reindexing
+df2 = df1.reset_index(drop=True)
+
+# Creating Mask that will put a line of separation between each Item
+mask = df2['Item Url'].ne(df2['Item Url'].shift(-1))
+df3 = pd.DataFrame('', index=mask.index[mask] + .5, columns=df.columns)
+
+# Creating the Final Dataframe.
+new_df = pd.concat([df2, df3]).sort_index().reset_index(drop=True).iloc[:-1]
+print('Finished Data Frame')
+# Exporting Dataframe to excel
+print('Exporting to Excel')
+new_df.to_excel(ExcelOutput, index=False)
 print('Finished')
