@@ -106,58 +106,79 @@ FuncResults = []
 
 
 # ***Defining function that will gather the information we need. ***
-def my_func(item):
-    # Item info
-    item_info = item
-    find_id = item_info.id
-    find_url = gis.content.get(find_id).url
-    item_title = item_info.title
-    item_owner = item_info.owner
-    item_type = item_info.type
+def my_func(connection, item, webapps):
 
-    # Return subset of map IDs which contain the service URL we're looking for
-    matches = [m.id for m in webmaps if str(m.get_data()).find(find_url) > -1]
+    # For some reason script won't pull in certain Urls so try and except added to prevent script breaking.
+    # If url cant be pulled it will still collect as much as the item info added.
+    try:
+        # Item info
+        item_info = item
+        find_id = item_info.id
+        find_url = connection.content.get(find_id).url
+        item_title = item_info.title
+        item_owner = item_info.owner
+        item_type = item_info.type
 
-    # Create empty list to populate with results
-    app_list = []
+        # Collects Web maps then Return subset of map IDs which contain the service URL we're looking for
+        webmaps = connection.content.search('', item_type='Web Map', max_items=-1)
+        matches = [m.id for m in webmaps if str(m.get_data()).find(find_url) > -1]
 
-    # Check each web app for matches
-    for w in WebApps:
+        # Create empty list to populate with results
+        app_list = []
 
-        try:
-            # Get the JSON as a string
-            wdata = str(w.get_data())
+        # Check each web app for matches
+        for w in webapps:
 
-            criteria = [
-                wdata.find(find_url) > -1,  # Check if URL is directly referenced
-                any([wdata.find(m) > -1 for m in matches])  # Check if any matching maps are in app
-            ]
+            try:
+                # Get the JSON as a string
+                wdata = str(w.get_data())
 
-            # If layer is referenced directly or indirectly, append app to list
-            if any(criteria):
-                app_list.append(w)
+                criteria = [
+                    wdata.find(find_url) > -1,  # Check if URL is directly referenced
+                    any([wdata.find(m) > -1 for m in matches])  # Check if any matching maps are in app
+                ]
 
-        # Some apps don't have data, so we'll just skip them if they throw a TypeError
-        except:
-            continue
+                # If layer is referenced directly or indirectly, append app to list
+                if any(criteria):
+                    app_list.append(w)
 
-    if len(app_list) > 0:
-        for a in app_list:
-            FuncResults.append({'Item Name': item_title, 'Item Type': item_type, 'Item ID': find_id,
-                                'Item Url': find_url, 'Item Owner': item_owner, 'Application Name': a.title,
-                                'Application Type': a.type, 'Application ID': a.id, 'Application Owner': a.owner})
+            # Some apps don't have data, so we'll just skip them if they throw a TypeError
+            except:
+                continue
 
-    if len(app_list) == 0:
-        FuncResults.append({'Item Name': item_title, 'Item Type': item_type, 'Item ID': find_id, 'Item Url': find_url,
-                            'Item Owner': item_owner, 'Application Name': 'N/A', 'Application Type': 'N/A',
-                            'Application ID': 'N/A', 'Application Owner': 'N/A'})
+        if len(app_list) > 0:
+            for a in app_list:
+                FuncResults.append({'Item Name': item_title, 'Item Type': item_type,
+                                    'Item ID': find_id, 'Item Url': find_url, 'Item Owner': item_owner,
+                                    'Application Name': a.title, 'Application Type': a.type, 'Application ID': a.id,
+                                    'Application Owner': a.owner})
+
+        if len(app_list) == 0:
+            FuncResults.append({'Item Name': item_title, 'Item Type': item_type,
+                                'Item ID': find_id, 'Item Url': find_url, 'Item Owner': item_owner,
+                                'Application Name': 'N/A', 'Application Type': 'N/A', 'Application ID': 'N/A',
+                                'Application Owner': 'N/A'})
+
+    except:
+        print("Exception found gathering baseline item info.")
+        item_info = item
+        find_id = item_info.id
+        item_title = item_info.title
+        item_owner = item_info.owner
+        item_type = item_info.type
+
+        FuncResults.append({'Item Name': item_title, 'Item Type': item_type,
+                            'Item ID': find_id, 'Item Url': 'Cant find Url', 'Item Owner': item_owner,
+                            'Application Name': 'N/A', 'Application Type': 'N/A', 'Application ID': 'N/A',
+                            'Application Owner': 'N/A'})
 
 
 # Running function through a loop
+print('Starting Items')
 for i in Items:
-    print("Starting " + str(i.title))
-    my_func(i)
-    print("Finished " + str(i.title))
+    print('working on ' + str(i.title))
+    my_func(gis, i, WebApps)
+print('Finished Items')
 
 df = pd.DataFrame(FuncResults)
 
