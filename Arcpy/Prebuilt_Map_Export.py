@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
 # Prebuilt_Map_Export.py
-# Created on: 2021-12-08
+# Created on: 2023-08-11
 # Updated on 2022-11-14
 # Works in ArcGIS Pro
 #
 # Author: Andrew Parkin/GIS Manager
 #
 # Description:
-#  Export Prebuilt Maps from ArcGIS Pro Map Series Layouts to individual PDFs
-#
-#
+#  Export Prebuilt Maps from ArcGIS Pro Map Series Layouts to individual PDFs. Then Exports them into size dependant
+#  folders on the network.
 # ---------------------------------------------------------------------------
 
 import sys
@@ -50,7 +49,7 @@ map_path_ArchD = 'R:\\GIS\\Data - Map sales\\Pre-designed GIS maps - PDF\\Arch D
 map_path_ArchE = 'R:\\GIS\\Data - Map sales\\Pre-designed GIS maps - PDF\\Arch E\\'
 Pro_project = r'C:\Users\aparkin\Documents\ArcGIS\Projects\CountyWideMaps_ForSale_Local.aprx'
 aprx = arcpy.mp.ArcGISProject(Pro_project)
-layouts = [0, 1, 2, 3, 6, 7, 8, 9, 10]
+layouts = [0, 1, 2, 3, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17]
 # Next two just used for reference only
 # mapseries_layouts = [9, 10]
 # other_layouts = [0, 1, 2, 6, 7, 8]
@@ -75,24 +74,24 @@ write_log("=====================================================================
     #print(f"  {lyt.name} ({lyt.pageHeight} x {lyt.pageWidth} {lyt.pageUnits})")
 
 try:
-    p = arcpy.mp.ArcGISProject(Pro_project)
+    #p = arcpy.mp.ArcGISProject(Pro_project)
 
     for lyt in layouts:
         l = aprx.listLayouts()[lyt]
         lname = f"{l.name}"
 
         #Arch E (6,7,9) Arch D (1,2, 10)
-        if lyt in (1, 2, 10):
+        if lyt in (2, 10):
             print(f'Starting {lname}...')
             l.exportToPDF(os.path.join(map_path_ArchD, f"{lname}.pdf"))
             print(f'Finished {lname}!')
 
-        elif lyt in (6, 7, 9):
+        elif lyt in (1, 6, 7, 9):
             print(f'Starting {lname}...')
             l.exportToPDF(os.path.join(map_path_ArchE, f"{lname}.pdf"))
             print(f'Finished {lname}!')
 
-        elif lyt in (0, 8):
+        elif lyt in (0, 8, 12, 13, 14, 15, 16, 17):
             print(f'Starting {lname}...')
             if not l.mapSeries is None:
                 ms = l.mapSeries
@@ -106,11 +105,18 @@ try:
                     ms.currentPageNumber = pageNum
                     print("Exporting {0}".format(ms.pageRow.MUNI_NAME))
                     pageName = ms.pageRow.MUNI_NAME
-                    if lyt in (0):
+                    # Exporting Arch D maps to Arch D Folder
+                    if lyt in (0, 12):
                         ms.exportToPDF(os.path.join(map_path_ArchD, f"{pageName}.pdf"), 'CURRENT')
-                    else:
+                    # Exporting Arch E maps to Arch E Folder
+                    elif lyt in (8,15):
                         ms.exportToPDF(os.path.join(map_path_ArchE, f"{pageName}.pdf"), 'CURRENT')
-
+                    # Exporting Tabloid maps to Tabloid Folder
+                    elif lyt in (13, 16):
+                        ms.exportToPDF(os.path.join(map_path_Tabloid, f"{pageName}.pdf"), 'CURRENT')
+                    # Exporting Letter maps to Letter Folder
+                    else:
+                        ms.exportToPDF(os.path.join(map_path_letter, f"{pageName}.pdf"), 'CURRENT')
 
             print(f'Finished {lname}!')
 
